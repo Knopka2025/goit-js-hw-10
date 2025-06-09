@@ -7,12 +7,11 @@ import iziToast from "izitoast";
 // Додатковий імпорт стилів
 import "izitoast/dist/css/iziToast.min.css";
 
-
-
 let userSelectedDate = 0;
 let timeDifference = 0;
 
 const btnStart = document.querySelector("[data-start]");
+const datetimePicker = document.querySelector("#datetime-picker");
 const showTime = document.querySelectorAll(".value");
 const [days, hours, minutes, seconds] = showTime;
 
@@ -46,17 +45,18 @@ const options = {
 
 flatpickr("#datetime-picker", options);
 
-
-
 btnStart.addEventListener("click", event => {
   event.preventDefault();
+  datetimePicker.disabled = true; // Блокуємо таймпікер
+  btnStart.classList.remove(`btn-active`);
+
   const countdownInterval = setInterval(() => {
     if (timeDifference < 1000) {
       clearInterval(countdownInterval);
+      datetimePicker.disabled = false; // Розблоковуємо таймпікер після завершення відліку
       return;
     }
     timeDifference = userSelectedDate - new Date(); 
-    btnStart.classList.remove(`btn-active`);
 
     const convertedTime = convertMs(timeDifference);
     days.innerText = convertedTime.days.toString().padStart(2, '0');
@@ -66,25 +66,16 @@ btnStart.addEventListener("click", event => {
   }, 1000);
 });
 
-
 function convertMs(ms) {
-  // Number of milliseconds per unit of time
   const second = 1000;
   const minute = second * 60;
   const hour = minute * 60;
   const day = hour * 24;
 
-  // Remaining days
   const days = Math.floor(ms / day);
-  // Remaining hours
   const hours = Math.floor((ms % day) / hour);
-  // Remaining minutes
   const minutes = Math.floor(((ms % day) % hour) / minute);
-  // Remaining seconds
   const seconds = Math.floor((((ms % day) % hour) % minute) / second);
 
   return { days, hours, minutes, seconds };
-};
-
-
-
+}
